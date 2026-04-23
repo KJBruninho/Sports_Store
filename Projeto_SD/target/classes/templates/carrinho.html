@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Carrinho de Compras</title>
+</head>
+<body>
+    <header>
+        <h1>Carrinho de Compras</h1>
+        <nav>
+            <a th:href="@{/home}">Home</a> |
+            <a th:href="@{/carrinho/limpar}">Limpar Carrinho</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Itens no Carrinho</h2>
+
+        <div th:if="${itens.isEmpty()}">
+            <p>O carrinho está vazio.</p>
+        </div>
+
+        <div th:each="produto : ${itens}">
+            <p>
+                <span th:text="${produto.nome}">Nome do Produto</span> - 
+                <span th:text="${produto.preco}">Preço</span> € - 
+                <span th:text="${produto.stock}">Estoque</span> unidades
+                <a th:href="@{/carrinho/remover/{id}(id=${produto.idProduto})}">Remover</a>
+            </p>
+        </div>
+
+        <hr>
+        <h3>Total: <span th:text="${total}">0.00</span> €</h3>
+    </section>
+
+    <footer>
+        <p>© 2025 Loja de Artigos Desportivos</p>
+    </footer>
+</body>
+</html>

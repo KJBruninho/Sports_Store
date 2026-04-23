@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${produto.nome}">Detalhes do Produto</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <header>
+        <h1 th:text="${produto.nome}">Nome do Produto</h1>
+        <nav>
+            <a th:href="@{/home}">Home</a> |
+            <a th:href="@{/signup}">Registar</a> |
+            <a th:href="@{/login}">Entrar</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Detalhes do Produto</h2>
+        <p><strong>Descrição:</strong> <span th:text="${produto.descricao}">Descrição aqui</span></p>
+        <p><strong>Preço:</strong> <span th:text="${produto.preco}">0.00</span> €</p>
+        <p><strong>Stock:</strong> <span th:text="${produto.stock}">0</span></p>
+
+        <!-- Aqui podes depois adicionar botão de "Adicionar ao Carrinho" -->
+    </section>
+
+    <footer>
+        <p>© 2025 Loja de Artigos Desportivos</p>
+    </footer>
+</body>
+</html>

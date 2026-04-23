@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Loja de Artigos Desportivos</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <header>
+        <h1>Loja de Artigos Desportivos</h1>
+		<nav>
+		    <a th:href="@{/}">Home</a> |
+		    <a th:href="@{/signup}">Registar</a> |
+		    <a th:href="@{/login}">Entrar</a> |
+		    <a th:href="@{/home}">Catálogo</a> |
+		    <a th:href="@{/carrinho}" title="Ver Carrinho">
+		        Carrinho (<span th:text="${carrinho != null ? carrinho.getItens().size() : 0}">0</span> itens) |
+		        Total: <span th:text="${carrinho != null ? carrinho.getTotal() : 0}">0</span> €
+		    </a> |
+			<span>Olá, <b th:text="${email}">email@exemplo.com</b></span> |
+		    <a th:href="@{/logout}">Logout</a>
+		</nav>
+
+
+    </header>
+
+    <section>
+        <h2>Catálogo de Produtos</h2>
+
+        <div th:if="${produtos == null || produtos.isEmpty()}">
+            <p>Nenhum produto disponível.</p>
+        </div>
+
+        <div th:each="produto : ${produtos}">
+            <div>
+                <h3>
+                    <a th:href="@{/produto/{id}(id=${produto.idProduto})}" th:text="${produto.nome}">Nome Produto</a>
+                </h3>
+                <p th:text="${produto.descricao}">Descrição aqui</p>
+                <p>Preço: <span th:text="${produto.preco}">0.00</span> €</p>
+                <p>Stock: <span th:text="${produto.stock}">0</span></p>
+                <!-- Link para adicionar o produto ao carrinho -->
+                <a th:href="@{/carrinho/adicionar/{id}(id=${produto.idProduto})}">Adicionar ao carrinho</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Loja de Artigos Desportivos</p>
+    </footer>
+</body>
+</html>

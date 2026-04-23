@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Signup</title>
+</head>
+<body>
+    <h2>Registar novo utilizador</h2>
+    <form action="/signup" method="post">
+        <label>Email:</label>
+        <input type="email" name="email" required />
+        <br/>
+        <label>Password:</label>
+        <input type="password" name="password" required />
+        <br/>
+        <label>Role:</label>
+        <select name="role" required>
+            <option value="CLIENTE" selected>Cliente</option>
+        </select>
+        <br/>
+        <button type="submit">Registar</button>
+    </form>
+</body>
+</html>

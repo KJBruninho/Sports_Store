@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  spring-app:
+    build: .
+    ports:
+      - "8080:8080"
+    container_name: spring-java
+    depends_on:
+      mysql-db:
+        condition: service_healthy # Garante que o mysql-db esteja saudável antes de iniciar
+    environment: # Variáveis de ambiente para conexão com o banco de dados
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/projetosd?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Mfav0803!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-database
+    environment:
+      MYSQL_ROOT_PASSWORD: Mfav0803!
+      MYSQL_DATABASE: projetosd
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-data:/var/lib/mysql
+    healthcheck: # Adiciona o healthcheck para o MySQL
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pMfav0803!"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s # Tempo para o MySQL iniciar antes de começar a testar
+
+volumes:
+  db-data:

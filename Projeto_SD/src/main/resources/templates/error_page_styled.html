@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Erro - SportZone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #27ae60, #3498db, #9b59b6);
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .error-icon {
+            font-size: 8rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s infinite;
+            display: block;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .error-code {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .error-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .error-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 1rem;
+            margin: 2rem 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .error-details h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-details p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-timestamp {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(149, 165, 166, 0.3);
+        }
+
+        .help-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .help-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .help-list {
+            text-align: left;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .help-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .help-list li::before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .contact-info h5 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Error Type Specific Styles */
+        .error-404 .error-icon::before { content: "🔍"; }
+        .error-500 .error-icon::before { content: "⚙️"; }
+        .error-403 .error-icon::before { content: "🚫"; }
+        .error-default .error-icon::before { content: "⚠️"; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 2rem;
+                margin: 20px;
+            }
+
+            .error-code {
+                font-size: 3rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .error-message {
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .error-icon {
+                font-size: 6rem;
+            }
+        }
+
+        /* Loading Animation for Retry Button */
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container" th:classappend="${status == 404} ? 'error-404' : (${status == 500} ? 'error-500' : (${status == 403} ? 'error-403' : 'error-default'))">
+        <div class="logo">
+            <h1>🏃‍♂️ SportZone</h1>
+            <p>Equipamento Desportivo</p>
+        </div>
+
+        <span class="error-icon"></span>
+
+        <div class="error-code" th:text="${status != null ? status : '?'}">404</div>
+        
+        <h2 class="error-title" th:text="${error != null ? error : 'Ups! Algo correu mal'}">
+            Página não encontrada
+        </h2>
+        
+        <p class="error-message" th:text="${message != null ? message : 'A página que procura não foi encontrada ou ocorreu um erro inesperado.'}">
+            A página que procura não foi encontrada. Pode ter sido removida, renomeada ou estar temporariamente indisponível.
+        </p>
+
+        <!-- Error Details (only shown if we have detailed error info) -->
+        <div class="error-details" th:if="${path != null or timestamp != null}">
+            <h4>Detalhes do Erro:</h4>
+            <p th:if="${path}"><strong>Caminho:</strong> <span th:text="${path}">N/A</span></p>
+            <p th:if="${timestamp}"><strong>Timestamp:</strong> <span th:text="${timestamp}" class="error-timestamp">N/A</span></p>
+            <p th:if="${trace}" style="font-family: monospace; font-size: 0.8rem; color: #999; max-height: 100px; overflow-y: auto;">
+                <strong>Stack Trace:</strong><br>
+                <span th:text="${trace}">N/A</span>
+            </p>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                ← Voltar
+            </a>
+            <a th:href="@{/}" class="btn btn-primary">
+                🏠 Página Inicial
+            </a>
+            <button onclick="window.location.reload()" class="btn btn-outline" id="retryBtn">
+                🔄 Tentar Novamente
+            </button>
+        </div>
+
+        <!-- Help Section -->
+        <div class="help-section">
+            <h4 class="help-title">O que pode fazer:</h4>
+            <ul class="help-list">
+                <li>Verificar se o endereço está correto</li>
+                <li>Voltar à página anterior e tentar novamente</li>
+                <li>Visitar a nossa página principal</li>
+                <li>Contactar o nosso suporte se o problema persistir</li>
+            </ul>
+
+            <div class="contact-info">
+                <h5>Precisa de ajuda?</h5>
+                <p>Se continuar a ter problemas, contacte o nosso suporte técnico.</p>
+                <p><strong>Email:</strong> suporte@sportzone.pt</p>
+                <p><strong>Telefone:</strong> +351 123 456 789</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add loading animation to retry button
+        document.getElementById('retryBtn').addEventListener('click', function() {
+            this.classList.add('btn-loading');
+            this.disabled = true;
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                history.back();
+            } else if (event.key === 'h' || event.key === 'H') {
+                window.location.href = '/';
+            } else if (event.key === 'r' || event.key === 'R') {
+                window.location.reload();
+            }
+        });
+
+        // Auto-focus on the primary action button for accessibility
+        window.addEventListener('load', function() {
+            const primaryBtn = document.querySelector('.btn-primary');
+            if (primaryBtn) {
+                primaryBtn.focus();
+            }
+        });
+
+        // Add some console humor for developers
+        console.log('🏃‍♂️ SportZone Error Page');
+        console.log('Teclas de atalho disponíveis:');
+        console.log('- Escape: Voltar');
+        console.log('- H: Página Inicial');
+        console.log('- R: Recarregar');
+    </script>
+</body>
+</html>

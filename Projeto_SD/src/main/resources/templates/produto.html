@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${produto.nome} + ' - SportZone'">Detalhes do Produto - SportZone</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #34495e;
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #3498db;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .breadcrumb {
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Product Details */
+        .product-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .product-image {
+            text-align: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-info h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .product-details {
+            margin: 2rem 0;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 120px;
+            font-size: 1.1rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .price-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .stock-value {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .stock-low {
+            color: #f39c12;
+        }
+
+        .stock-out {
+            color: #e74c3c;
+        }
+
+        .description-value {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin-top: 0.5rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            margin-top: 2rem;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Related Products Section */
+        .related-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .product-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem;
+            }
+
+            .product-info h2 {
+                font-size: 2rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Product Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-low {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🏃‍♂️ SportZone</h1>
+                </div>
+                <div class="product-title" th:text="${produto.nome}">Nome do Produto</div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <div class="nav-content">
+                <a th:href="@{/home}">Home</a>
+                <a th:href="@{/signup}">Registar</a>
+                <a th:href="@{/login}">Entrar</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="breadcrumb">
+                <a th:href="@{/home}">🏠 Catálogo</a> > <span th:text="${produto.nome}">Produto</span>
+            </div>
+
+            <section class="product-container">
+                <div class="product-image">
+                    <img src="/api/placeholder/400/400" alt="Imagem do Produto" th:alt="${produto.nome}">
+                </div>
+                
+                <div class="product-info">
+                    <h2 th:text="${produto.nome}">Nome do Produto</h2>
+                    
+                    <div class="product-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Descrição:</span>
+                        </div>
+                        <div class="description-value" th:text="${produto.descricao}">Descrição aqui</div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Preço:</span>
+                            <span class="detail-value price-value" th:text="${produto.preco} + ' €'">0.00 €</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Stock:</span>
+                            <span class="detail-value stock-value" 
+                                  th:classappend="${produto.stock > 10} ? 'stock-value' : (${produto.stock > 0} ? 'stock-low' : 'stock-out')"
+                                  th:text="${produto.stock}">0</span>
+                            <span class="status-indicator"
+                                  th:classappend="${produto.stock > 10} ? 'status-available' : (${produto.stock > 0} ? 'status-low' : 'status-out')"
+                                  th:text="${produto.stock > 10} ? 'Disponível' : (${produto.stock > 0} ? 'Stock Baixo' : 'Esgotado')">
+                                Status
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="#" class="btn btn-primary" th:if="${produto.stock > 0}">
+                            🛒 Adicionar ao Carrinho
+                        </a>
+                        <a href="#" class="btn btn-outline" th:unless="${produto.stock > 0}">
+                            📧 Notificar quando disponível
+                        </a>
+                        <a th:href="@{/home}" class="btn btn-outline">
+                            ← Voltar ao Catálogo
+                        </a>
+                        <a href="#" class="btn btn-secondary">
+                            ❤️ Adicionar aos Favoritos
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="related-section">
+                <h3 class="section-title">Produtos Relacionados</h3>
+                <p style="text-align: center; color: #666;">
+                    Descubra outros produtos similares no nosso catálogo
+                </p>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a th:href="@{/home}" class="btn btn-primary">Ver Mais Produtos</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 SportZone - Loja de Artigos Desportivos</p>
+        </div>
+    </footer>
+</body>
+</html>

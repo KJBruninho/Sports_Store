@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            background-color: #004080;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            margin-top: 20px;
+        }
+        h1 {
+            color: #004080;
+        }
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #004080;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        a.button:hover {
+            background-color: #003366;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>Área Administrativa</h2>
+    </header>
+    <main>
+        <h1>Bem-vindo, Administrador!</h1>
+        <div class="section">
+            <h3>Gestão de Utilizadores</h3>
+            <p>Aqui podes adicionar, editar ou remover utilizadores.</p>
+            <a href="/admin/users" class="button">Gerir Utilizadores</a>
+        </div>
+        <div class="section">
+            <h3>Relatórios</h3>
+            <p>Visualiza relatórios de vendas, utilizadores e estatísticas.</p>
+            <a href="/admin/reports" class="button">Ver Relatórios</a>
+        </div>
+        <div class="section">
+            <h3>Configurações do Sistema</h3>
+            <p>Configura opções gerais do sistema e definições de segurança.</p>
+            <a href="/admin/settings" class="button">Configurações</a>
+        </div>
+    </main>
+</body>
+</html>
