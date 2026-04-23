@@ -1,8 +1,8 @@
-# 🏅 Sports Store
+# Sports Store
 
 Uma plataforma de e-commerce moderna e responsiva dedicada à venda de equipamentos e artigos desportivos. O projeto foca-se em oferecer uma experiência de utilizador fluida, desde a navegação no catálogo até ao processo de finalização de compra.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 * Catálogo de Produtos: Visualização dinâmica de artigos com filtragem por categorias.
 * Gestão de Carrinho: Adicionar, remover e atualizar quantidades em tempo real.
@@ -18,7 +18,7 @@ Uma plataforma de e-commerce moderna e responsiva dedicada à venda de equipamen
 * Base de Dados: SQL Server (MSSQL)
 * Autenticação: JWT (JSON Web Tokens)
 
-## 📦 Instalação e Configuração
+## Instalação e Configuração
 
 1. Clonar o repositório:
 git clone https://github.com/KJBruninho/Sports_Store.git
@@ -48,14 +48,6 @@ npm start
 * src/routes - Endpoints da API.
 * src/public - Frontend (HTML, CSS, JS).
 * server.js - Ponto de entrada.
-
-## 🤝 Contribuição
-
-1. Faz um Fork do projeto.
-2. Cria uma Branch (git checkout -b feature/NovaFeature).
-3. Faz Commit (git commit -m 'Adiciona NovaFeature').
-4. Faz Push (git push origin feature/NovaFeature).
-5. Abre um Pull Request.
 
 ---
 Desenvolvido por KJBruninho (https://github.com/KJBruninho)
