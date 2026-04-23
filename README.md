@@ -50,4 +50,4 @@ npm start
 * server.js - Ponto de entrada.
 
 ---
-Desenvolvido por KJBruninho (https://github.com/KJBruninho)
+Desenvolvido por [Bruno Marinho](https://github.com/KJBruninho)
