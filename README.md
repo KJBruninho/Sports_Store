@@ -14,7 +14,7 @@ Uma plataforma de e-commerce moderna e responsiva dedicada à venda de equipamen
 ## 🛠️ Tecnologias Utilizadas
 
 * Frontend: HTML5, CSS3, JavaScript
-* Backend: Node.js
+* Backend: Spring Maven
 * Base de Dados: SQL Server (MSSQL)
 * Autenticação: JWT (JSON Web Tokens)
 
