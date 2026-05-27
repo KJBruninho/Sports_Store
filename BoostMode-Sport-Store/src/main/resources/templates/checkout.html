@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - BoostMode</title>
+    <link rel="stylesheet" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <a class="brand-logo" th:href="@{/}">
+                <span class="logo-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/catalogo}">Catálogo</a>
+                <a th:href="@{/carrinho}">Carrinho</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <section class="cart-hero">
+            <div class="hero-content">
+                <span class="tech-tag">Checkout</span>
+                <h1>Confirmar compra.</h1>
+                <p>Revê os dados antes de finalizar a encomenda.</p>
+            </div>
+        </section>
+
+        <section class="cart-section">
+            <h2 class="section-title">Resumo da compra</h2>
+
+            <article th:each="item : ${itens}" class="cart-item">
+                <div class="item-info">
+                    <div class="item-name" th:text="${item.produto.nome}">Produto</div>
+                    <div class="item-details">
+                        <span th:text="'Quantidade: ' + ${item.quantidade}">Quantidade</span>
+                        <span th:text="'Preço: ' + ${item.produto.preco} + ' €'">Preço</span>
+                        <span th:text="'Subtotal: ' + ${item.produto.preco * item.quantidade} + ' €'">Subtotal</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="total-section">
+            <h3>Total</h3>
+            <div class="total-amount" th:text="${#numbers.formatDecimal(total, 1, 2)} + ' €'">0.00 €</div>
+
+            <form th:action="@{/checkout/finalizar}" method="post">
+                <button type="submit" class="btn btn-primary">
+                    Confirmar e finalizar compra
+                </button>
+            </form>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

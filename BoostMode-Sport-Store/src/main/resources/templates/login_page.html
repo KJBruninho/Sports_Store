@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/authentication.css}">
+</head>
+
+<body class="auth-page">
+
+<main class="auth-shell">
+    <section class="auth-card">
+        <a class="auth-brand" th:href="@{/}">
+            <span class="brand-mark">BM</span>
+            <span>BoostMode</span>
+        </a>
+
+        <div class="auth-heading">
+            <span>Login</span>
+            <h1>Bem-vindo de volta</h1>
+            <p>Acede à tua conta para continuar as compras.</p>
+        </div>
+
+        <div th:if="${param.erro}" class="alert-error">
+            <span th:if="${param.erro[0] == 'EMAIL_INVALIDO'}">
+                O formato do email é inválido.
+            </span>
+
+            <span th:if="${param.erro[0] == 'EMAIL_INEXISTENTE'}">
+                Não existe nenhuma conta com esse email.
+            </span>
+
+            <span th:if="${param.erro[0] == 'PASSWORD_INCORRETA'}">
+                Password incorreta.
+            </span>
+
+            <span th:if="${param.erro[0] == 'CONTA_BLOQUEADA'}">
+                Esta conta está bloqueada ou inativa.
+            </span>
+        </div>
+
+        <div th:if="${param.error}" class="alert-error">
+            Email ou password inválidos.
+        </div>
+
+        <div th:if="${param.logout}" class="alert-success">
+            Sessão terminada com sucesso.
+        </div>
+
+        <form th:action="@{/login}" method="post" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    required
+                    maxlength="255"
+                    pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$"
+                    title="Introduz um email válido. Exemplo: nome@dominio.com"
+                    placeholder="nome@dominio.com"
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    maxlength="255"
+                    placeholder="A tua password"
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                Entrar
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            Ainda não tens conta?
+            <a th:href="@{/signup}">Criar conta</a>
+        </p>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar conta - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/authentication.css}">
+</head>
+
+<body class="auth-page">
+
+<main class="auth-shell">
+    <section class="auth-card">
+        <a class="auth-brand" th:href="@{/}">
+            <span class="brand-mark">BM</span>
+            <span>BoostMode</span>
+        </a>
+
+        <div class="auth-heading">
+            <span>Criar conta</span>
+            <h1>Entra na BoostMode</h1>
+            <p>Cria uma conta para guardar favoritos, usar o carrinho e finalizar compras.</p>
+        </div>
+
+        <div th:if="${erro != null}" class="alert-error">
+            <span th:text="${erro}">Erro</span>
+        </div>
+
+        <div th:if="${sucesso != null}" class="alert-success">
+            <span th:text="${sucesso}">Sucesso</span>
+        </div>
+
+        <form th:action="@{/signup}" method="post" class="auth-form">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input
+                    id="nome"
+                    type="text"
+                    name="nome"
+                    required
+                    maxlength="255"
+                    placeholder="O teu nome"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    required
+                    maxlength="255"
+                    pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$"
+                    title="Introduz um email válido. Exemplo: nome@dominio.com"
+                    placeholder="nome@dominio.com"
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    minlength="6"
+                    maxlength="255"
+                    placeholder="Mínimo 6 caracteres"
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="morada">Morada</label>
+                <input
+                    id="morada"
+                    type="text"
+                    name="morada"
+                    maxlength="255"
+                    placeholder="A tua morada (Opcional)"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                Criar conta
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            Já tens conta?
+            <a th:href="@{/login}">Entrar</a>
+        </p>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - BoostMode</title>
+    <link rel="stylesheet" href="/css/admin-error.css" th:href="@{/css/admin-error.css}">
+</head>
+<body class="admin-page">
+    <header class="admin-header">
+        <div class="admin-topbar">
+            <a href="/" class="brand" th:href="@{/}">
+                <span class="brand-mark brand-mark-dark">BM</span>
+                <span>BoostMode</span>
+            </a>
+
+            <nav class="admin-nav" aria-label="Navegação administrativa">
+                <a href="/logout" th:href="@{/logout}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <section class="admin-hero">
+            <span class="eyebrow">Painel interno</span>
+            <h1>Área Administrativa</h1>
+            <p>
+                Gere utilizadores, acompanha relatórios e controla definições críticas da plataforma BoostMode.
+            </p>
+        </section>
+
+        <section class="admin-grid" aria-label="Opções de administração">
+            <article class="admin-card">
+                <div class="card-index">01</div>
+                <div>
+                    <h2>Gestão de Utilizadores</h2>
+                    <p>Adicionar, editar, remover ou consultar utilizadores registados.</p>
+                    <a href="/admin/utilizadores" th:href="@{/admin/utilizadores}" class="admin-button">Gerir utilizadores</a>
+                </div>
+            </article>
+
+            <article class="admin-card">
+                <div class="card-index">02</div>
+                <div>
+                    <h2>Gestão de Relatórios</h2>
+                    <p>Visualizar vendas, estatísticas, atividade de clientes e desempenho da loja.</p>
+                    <a href="/admin/relatorios" th:href="@{/admin/relatorios}" class="admin-button">Ver relatórios</a>
+                </div>
+            </article>
+
+            <article class="admin-card">
+                <div class="card-index">03</div>
+                <div>
+                    <h2>Gestão de Sistema</h2>
+                    <p>Gerir definições gerais e parâmetros internos da aplicação.</p>
+                    <a href="/admin/settings" th:href="@{/admin/produtos}" class="admin-button">Gerir Sistemas</a>
+                </div>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

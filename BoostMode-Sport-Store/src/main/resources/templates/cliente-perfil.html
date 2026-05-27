@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Área do Cliente - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <a class="brand-logo" th:href="@{/}">
+                <span class="logo-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/}">Início</a>
+                <a th:href="@{/catalogo}">Catálogo</a>
+				<a th:href="@{/favoritos}">Favoritos</a>
+
+                <a th:href="@{/carrinho}" title="Ver carrinho" class="cart-pill">
+                    Carrinho · <span th:text="${carrinhoQuantidade}">0</span>
+                    itens · <span th:text="${#numbers.formatDecimal(carrinhoTotal, 1, 2)}">0.00</span> €
+                </a>
+
+                <a th:href="@{/logout}" class="logout-pill">Sair</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <section class="cart-hero">
+            <div class="hero-content">
+                <span class="tech-tag">Área do Cliente</span>
+                <h1 th:text="'Olá, ' + ${cliente.nome}">Olá, Cliente</h1>
+                <p>Consulta os teus dados, carrinho, favoritos e histórico de compras.</p>
+            </div>
+        </section>
+
+        <section class="profile-grid">
+
+            <article class="profile-card">
+                <h2>Dados da conta</h2>
+
+                <div class="profile-row">
+                    <span>Nome</span>
+                    <strong th:text="${cliente.nome}">Nome Cliente</strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Email</span>
+                    <strong th:text="${user.email}">email@example.com</strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Morada</span>
+                    <strong th:text="${cliente.morada != null && !cliente.morada.isEmpty() ? cliente.morada : 'Sem morada definida'}">
+                        Morada
+                    </strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Role</span>
+                    <strong th:text="${user.role}">CLIENTE</strong>
+                </div>
+            </article>
+
+            <article class="profile-card">
+                <h2>Resumo do carrinho</h2>
+
+                <div class="profile-stat">
+                    <strong th:text="${carrinhoQuantidade}">0</strong>
+                    <span>Itens no carrinho</span>
+                </div>
+
+                <div class="profile-stat">
+                    <strong th:text="${#numbers.formatDecimal(totalCarrinho, 1, 2)} + ' €'">0.00 €</strong>
+                    <span>Total atual</span>
+                </div>
+
+                <a th:href="@{/carrinho}" class="btn btn-primary profile-btn">
+                    Ver carrinho
+                </a>
+            </article>
+
+            <article class="profile-card">
+                <h2>Favoritos</h2>
+
+                <div class="profile-stat">
+                    <strong th:text="${favoritos != null ? favoritos.size() : 0}">0</strong>
+                    <span>Produtos guardados</span>
+                </div>
+
+                <a th:href="@{/favoritos}" class="btn btn-outline profile-btn">
+                    Ver favoritos
+                </a>
+            </article>
+
+            <article class="profile-card">
+                <h2>Compras</h2>
+
+                <div class="profile-stat">
+                    <strong th:text="${vendas != null ? vendas.size() : 0}">0</strong>
+                    <span>Compras realizadas</span>
+                </div>
+
+                <a href="#historico" class="btn btn-outline profile-btn">
+                    Ver histórico
+                </a>
+            </article>
+
+        </section>
+
+        <section class="cart-section profile-section">
+            <h2 class="section-title">Carrinho atual</h2>
+
+            <div th:if="${itensCarrinho == null || itensCarrinho.isEmpty()}" class="empty-cart">
+                <p>O teu carrinho está vazio.</p>
+                <a th:href="@{/catalogo}" class="btn btn-primary">Ir para o catálogo</a>
+            </div>
+
+            <div th:unless="${itensCarrinho == null || itensCarrinho.isEmpty()}">
+                <article th:each="item : ${itensCarrinho}" class="cart-item">
+                    <div class="item-info">
+                        <div class="item-name" th:text="${item.produto.nome}">Produto</div>
+
+                        <div class="item-details">
+                            <span th:text="'Quantidade: ' + ${item.quantidade}">Quantidade</span>
+                            <span th:text="'Preço: ' + ${#numbers.formatDecimal(item.produto.preco, 1, 2)} + ' €'">Preço</span>
+                            <span th:text="'Stock: ' + ${item.produto.stock}">Stock</span>
+                        </div>
+                    </div>
+
+                    <div class="item-actions">
+                        <a th:href="@{/produto/{id}(id=${item.produto.idProduto})}" class="btn btn-outline">
+                            Ver produto
+                        </a>
+                    </div>
+                </article>
+
+                <div class="profile-total-line">
+                    <span>Total do carrinho</span>
+                    <strong th:text="${#numbers.formatDecimal(totalCarrinho, 1, 2)} + ' €'">0.00 €</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="cart-section profile-section">
+            <h2 class="section-title">Favoritos</h2>
+
+            <div th:if="${favoritos == null || favoritos.isEmpty()}" class="empty-cart">
+                <p>Ainda não tens favoritos.</p>
+            </div>
+
+            <div class="product-grid" th:unless="${favoritos == null || favoritos.isEmpty()}">
+                <article th:each="fav : ${favoritos}" class="product-card">
+                    <a class="product-card-main-link"
+                       th:href="@{/produto/{id}(id=${fav.produto.idProduto})}">
+
+                        <img
+                            class="product-card-image"
+                            th:src="${fav.produto.imagemUrl != null && !fav.produto.imagemUrl.isEmpty()
+                                ? fav.produto.imagemUrl
+                                : (fav.produto.categoria != null
+                                    ? '/img/categorias/' + #strings.toLowerCase(fav.produto.categoria.nome) + '.png'
+                                    : '/img/default-product.png')}"
+                            onerror="this.onerror=null; this.src='/img/default-product.png';"
+                            th:alt="${fav.produto.nome}"
+                        >
+
+                        <div class="product-card-body">
+                            <h3 class="product-name" th:text="${fav.produto.nome}">Produto</h3>
+
+                            <p class="product-description" th:text="${fav.produto.descricao}">
+                                Descrição
+                            </p>
+
+                            <div class="product-details">
+                                <span class="product-price">
+                                    <span th:text="${#numbers.formatDecimal(fav.produto.preco, 1, 2)}">0.00</span> €
+                                </span>
+
+                                <span class="product-stock">
+                                    Stock: <span th:text="${fav.produto.stock}">0</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </section>
+
+        <section class="cart-section profile-section" id="historico">
+            <h2 class="section-title">Histórico de compras</h2>
+
+            <div th:if="${vendas == null || vendas.isEmpty()}" class="empty-cart">
+                <p>Ainda não realizaste compras.</p>
+            </div>
+
+            <div th:unless="${vendas == null || vendas.isEmpty()}" class="orders-list">
+                <article th:each="venda : ${vendas}" class="order-card">
+                    <div>
+                        <h3>Venda nº <span th:text="${venda.idVenda}">1</span></h3>
+                        <p>
+                            Data:
+                            <span th:text="${venda.data}">Data</span>
+                        </p>
+                    </div>
+
+                    <a th:href="@{/faturas/venda/{idVenda}(idVenda=${venda.idVenda})}" class="btn btn-primary">
+                        Ver fatura
+                    </a>
+                </article>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 BoostMode — Área do cliente.</p>
+    </div>
+</footer>
+
+</body>
+</html>

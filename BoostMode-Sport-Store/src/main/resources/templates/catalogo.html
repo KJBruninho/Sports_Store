@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - BoostMode</title>
+
+    <style>
+        html {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        html.page-ready {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.12s ease;
+        }
+    </style>
+
+    <link rel="stylesheet" href="/css/boostmode-pages.css" th:href="@{/css/boostmode-pages.css}">
+
+    <script>
+        window.addEventListener("load", function () {
+            document.documentElement.classList.add("page-ready");
+        });
+    </script>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <a class="brand-logo" th:href="@{/}">
+                <span class="logo-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/}">Início</a>
+
+                <a th:href="@{/carrinho}" title="Ver carrinho" class="cart-pill">
+                    Carrinho · <span th:text="${carrinhoQuantidade}">0</span>
+                    itens · <span th:text="${#numbers.formatDecimal(carrinhoTotal, 1, 2)}">0.00</span> €
+                </a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <section class="catalog-hero">
+            <div class="hero-content">
+                <span class="tech-tag">Catálogo BoostMode</span>
+                <h1>Equipamento para ativar o próximo nível.</h1>
+                <p>
+                    Produtos selecionados para treino, performance e rotina desportiva, com uma identidade visual
+                    mais técnica e moderna.
+                </p>
+            </div>
+        </section>
+
+        <section class="products-section">
+            <h2 class="section-title">Catálogo de Produtos</h2>
+            <p class="section-subtitle">Explora os artigos disponíveis e adiciona ao carrinho.</p>
+
+            <div class="catalog-layout">
+
+                <aside class="filters-sidebar">
+                    <h3>Filtros</h3>
+
+                    <form th:action="@{/catalogo}" method="get" class="filters-form">
+                        <div class="filter-group">
+                            <label for="termo">Pesquisar</label>
+                            <input
+                                id="termo"
+                                type="text"
+                                name="termo"
+                                placeholder="Nome ou descrição"
+                                th:value="${termo}"
+                            >
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="categoria">Categoria</label>
+                            <select id="categoria" name="categoria">
+                                <option value="">Todas</option>
+
+                                <option
+                                    th:each="cat : ${categorias}"
+                                    th:value="${cat.idCategoria}"
+                                    th:text="${cat.nome}"
+                                    th:selected="${categoriaSelecionada != null && categoriaSelecionada == cat.idCategoria}">
+                                    Categoria
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="precoMin">Preço mínimo</label>
+                            <input
+                                id="precoMin"
+                                type="number"
+                                name="precoMin"
+                                placeholder="0"
+                                step="0.01"
+                                th:value="${precoMin}"
+                            >
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="precoMax">Preço máximo</label>
+                            <input
+                                id="precoMax"
+                                type="number"
+                                name="precoMax"
+                                placeholder="999"
+                                step="0.01"
+                                th:value="${precoMax}"
+                            >
+                        </div>
+
+                        <label class="stock-filter">
+                            <input
+                                type="checkbox"
+                                name="comStock"
+                                value="true"
+                                th:checked="${comStock}"
+                            >
+                            Apenas com stock
+                        </label>
+
+                        <button type="submit" class="btn btn-primary keep-scroll filter-button">
+                            Aplicar filtros
+                        </button>
+
+                        <a th:href="@{/catalogo}" class="clear-filters">
+                            Limpar filtros
+                        </a>
+                    </form>
+                </aside>
+
+                <div class="catalog-products">
+
+                    <div th:if="${aviso != null}" class="alert-warning">
+                        <span th:text="${aviso}">Aviso</span>
+                    </div>
+
+                    <div th:if="${produtos == null || produtos.isEmpty()}" class="no-products">
+                        <img
+                            class="product-card-image"
+                            th:src="@{/img/default-product.png}"
+                            alt="Nenhum produto disponível"
+                        >
+
+                        <p th:text="${aviso != null ? aviso : 'Nenhum produto disponível.'}">
+                            Nenhum produto disponível.
+                        </p>
+                    </div>
+
+                    <div class="product-grid" th:unless="${produtos == null || produtos.isEmpty()}">
+                        <article th:each="produto : ${produtos}"
+                                 class="product-card clickable-card"
+                                 th:attr="data-item-id=${produto.idProduto}">
+
+                            <a class="product-card-main-link"
+                               th:href="@{/produto/{id}(id=${produto.idProduto})}"
+                               th:aria-label="'Ver produto ' + ${produto.nome}">
+
+                                <img
+                                    class="product-card-image"
+                                    th:src="${produto.imagemUrl != null && !produto.imagemUrl.isEmpty()
+                                        ? produto.imagemUrl
+                                        : (produto.categoria != null && produto.categoria.imagemUrl != null && !produto.categoria.imagemUrl.isEmpty()
+                                            ? produto.categoria.imagemUrl
+                                            : '/img/default-product.png')}"
+                                    th:attr="data-category-img=${produto.categoria != null && produto.categoria.imagemUrl != null && !produto.categoria.imagemUrl.isEmpty()
+                                        ? produto.categoria.imagemUrl
+                                        : '/img/default-product.png'}"
+                                    onerror="
+                                        if (!this.dataset.usedCategory) {
+                                            this.dataset.usedCategory = 'true';
+                                            this.src = this.dataset.categoryImg;
+                                        } else {
+                                            this.onerror = null;
+                                            this.src = '/img/default-product.png';
+                                        }
+                                    "
+                                    th:alt="${produto.nome}"
+                                >
+
+                                <div class="product-card-body">
+                                    <h3 class="product-name" th:text="${produto.nome}">
+                                        Nome Produto
+                                    </h3>
+
+                                    <p class="product-description" th:text="${produto.descricao}">
+                                        Descrição aqui
+                                    </p>
+
+                                    <div class="product-details">
+                                        <span class="product-price">
+                                            <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0.00</span> €
+                                        </span>
+
+                                        <span class="product-stock">
+                                            Stock: <span th:text="${produto.stock}">0</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <div class="product-card-actions">
+
+                                <form th:action="@{/carrinho/adicionar/{id}(id=${produto.idProduto})}"
+                                      method="post"
+                                      class="add-cart-form keep-scroll-form">
+
+                                    <div class="quantity-control">
+                                        <label th:for="'quantidade-' + ${produto.idProduto}">Qtd.</label>
+
+                                        <input
+                                            th:id="'quantidade-' + ${produto.idProduto}"
+                                            type="number"
+                                            name="quantidade"
+                                            min="1"
+                                            th:max="${produto.stock}"
+                                            value="1"
+                                            required
+                                        >
+                                    </div>
+
+                                    <button type="submit"
+                                            class="btn btn-primary"
+                                            style="width: 100%;"
+                                            th:disabled="${produto.stock <= 0}">
+                                        Adicionar ao carrinho
+                                    </button>
+                                </form>
+								
+                                <a th:href="@{/favoritos/adicionar/{id}(id=${produto.idProduto})}"
+                                   class="btn btn-favorite keep-scroll"
+                                   style="width: 100%;">
+                                    ♡ Adicionar aos favoritos
+                                </a>
+								
+                            </div>
+                        </article>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 BoostMode — Equipamento desportivo com energia e tecnologia.</p>
+    </div>
+</footer>
+
+<script>
+    if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+    }
+
+    document.documentElement.classList.add("no-smooth-scroll");
+
+    function animateScrollTo(targetY, duration) {
+        return new Promise(function (resolve) {
+            const startY = window.scrollY;
+            const distance = targetY - startY;
+            const startTime = performance.now();
+
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutCubic(progress);
+
+                window.scrollTo(0, startY + distance * easedProgress);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    window.scrollTo(0, targetY);
+                    resolve();
+                }
+            }
+
+            requestAnimationFrame(step);
+        });
+    }
+
+    window.addEventListener("load", async function () {
+        const scrollPosition = sessionStorage.getItem("scrollPosition");
+        const clickedItemId = sessionStorage.getItem("clickedItemId");
+        const loader = document.getElementById("scrollLoader");
+
+        if (scrollPosition !== null) {
+            if (loader) {
+                loader.classList.add("is-active");
+            }
+
+            const targetY = parseInt(scrollPosition, 10);
+
+            sessionStorage.removeItem("scrollPosition");
+
+            await new Promise(function (resolve) {
+                setTimeout(resolve, 100);
+            });
+
+            await animateScrollTo(targetY, 100);
+
+            if (clickedItemId !== null) {
+                const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+                if (item) {
+                    item.classList.add("item-highlight");
+
+                    setTimeout(function () {
+                        item.classList.remove("item-highlight");
+                    }, 900);
+                }
+
+                sessionStorage.removeItem("clickedItemId");
+            }
+
+            setTimeout(function () {
+                if (loader) {
+                    loader.classList.remove("is-active");
+                }
+
+                document.documentElement.classList.remove("no-smooth-scroll");
+            }, 180);
+
+        } else {
+            document.documentElement.classList.remove("no-smooth-scroll");
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const loader = document.getElementById("scrollLoader");
+
+        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+            link.addEventListener("click", function () {
+                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+                const item = link.closest("[data-item-id]");
+                if (item) {
+                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+                }
+
+                if (loader) {
+                    loader.classList.add("is-active");
+                }
+            });
+        });
+
+        document.querySelectorAll("form.keep-scroll-form").forEach(function (form) {
+            form.addEventListener("submit", function () {
+                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+                const item = form.closest("[data-item-id]");
+                if (item) {
+                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+                }
+
+                if (loader) {
+                    loader.classList.add("is-active");
+                }
+            });
+        });
+    });
+</script>
+
+<div id="scrollLoader" class="scroll-loader">
+    <div class="scroll-loader-box">A atualizar...</div>
+</div>
+
+</body>
+</html>

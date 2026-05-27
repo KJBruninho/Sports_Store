@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+	<head>
+	    <meta charset="UTF-8">
+	    <title>Gestão de Produtos - BoostMode</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/css/admin-error.css" th:href="@{/css/admin-error.css}">
+	</head>
+	<body class="admin-page">
+
+	<header class="admin-header">
+	    <div class="admin-container header-content">
+	        <a href="/" class="brand" th:href="@{/}">
+	            <span class="brand-mark brand-mark-dark">BM</span>
+	            <span>BoostMode</span>
+	        </a>
+
+	        <nav class="admin-nav" aria-label="Navegação administrativa">
+	            <a th:href="@{/admin/dashboard}">Painel</a>
+	            <a th:href="@{/admin/utilizadores}">Gestor de Utilizadores</a>
+	            <a th:href="@{/admin/relatorios}">Gestor de Relatórios</a>
+	            <a th:href="@{/admin/produtos}" class="active">Gestor de Sistemas</a>
+	            <a th:href="@{/logout}">Sair</a>
+	        </nav>
+	    </div>
+	</header>
+
+<main class="admin-main">
+	<div class="admin-container">
+    <section class="admin-hero">
+        <span class="eyebrow">Gestão interna</span>
+        <h1>Produtos e Categorias</h1>
+        <p>Adiciona, consulta e remove produtos ou categorias do catálogo BoostMode.</p>
+    </section>
+
+    <section class="admin-stats-grid">
+        <article class="admin-stat-card">
+            <span>Produtos</span>
+            <strong th:text="${totalProdutos}">0</strong>
+            <p>produtos no catálogo</p>
+        </article>
+
+        <article class="admin-stat-card">
+            <span>Categorias</span>
+            <strong th:text="${totalCategorias}">0</strong>
+            <p>categorias disponíveis</p>
+        </article>
+
+        <article class="admin-stat-card">
+            <span>Sem stock</span>
+            <strong th:text="${produtosSemStock}">0</strong>
+            <p>produtos indisponíveis</p>
+        </article>
+
+        <article class="admin-stat-card">
+            <span>Gestão</span>
+            <strong>CRUD</strong>
+            <p>produtos e categorias</p>
+        </article>
+    </section>
+
+    <div th:if="${sucesso}" class="admin-alert admin-alert-success" th:text="${sucesso}">
+        Operação concluída.
+    </div>
+
+    <div th:if="${erro}" class="admin-alert admin-alert-error" th:text="${erro}">
+        Ocorreu um erro.
+    </div>
+
+    <section class="admin-management-grid">
+
+        <article class="admin-panel">
+            <div class="admin-panel-header">
+                <div>
+                    <h2>Adicionar categoria</h2>
+                    <p>Cria uma nova categoria para organizar os produtos.</p>
+                </div>
+            </div>
+
+			<form th:action="@{/admin/categorias/adicionar}" method="post" class="admin-form">
+			    <div class="admin-form-group">
+			        <label for="categoriaNome">Nome da categoria</label>
+			        <input id="categoriaNome"
+			               type="text"
+			               name="nome"
+			               placeholder="Ex: Futebol"
+			               required>
+			    </div>
+
+			    <div class="admin-form-group">
+			        <label for="categoriaImagem">Imagem da categoria</label>
+			        <input id="categoriaImagem"
+			               type="text"
+			               name="imagemUrl"
+			               placeholder="https://... ou /img/categorias/futebol.png">
+			    </div>
+
+			    <button type="submit" class="admin-btn admin-btn-primary">
+			        Adicionar categoria
+			    </button>
+			</form>
+        </article>
+
+        <article class="admin-panel">
+            <div class="admin-panel-header">
+                <div>
+                    <h2>Categorias existentes</h2>
+                    <p>Remove categorias sem produtos associados.</p>
+                </div>
+            </div>
+
+            <div class="admin-category-list">
+                <div th:each="categoria : ${categorias}" class="admin-category-item">
+					<div class="admin-category-info">
+					    <span th:text="${categoria.nome}">Categoria</span>
+
+					    <small th:if="${categoria.imagemUrl != null && !categoria.imagemUrl.isEmpty()}">
+					        Com imagem
+					    </small>
+
+					    <small th:if="${categoria.imagemUrl == null || categoria.imagemUrl.isEmpty()}">
+					        Sem imagem
+					    </small>
+					</div>
+
+                    <form th:action="@{/admin/categorias/{id}/remover(id=${categoria.idCategoria})}"
+                          method="post">
+                        <button type="submit" class="admin-btn admin-btn-danger">
+                            Remover
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${categorias == null || categorias.isEmpty()}" class="empty-row">
+                    Nenhuma categoria criada.
+                </div>
+            </div>
+        </article>
+
+    </section>
+
+    <section class="admin-panel reports-panel">
+        <div class="admin-panel-header">
+            <div>
+                <h2>Adicionar produto</h2>
+                <p>Cria um novo produto no catálogo.</p>
+            </div>
+        </div>
+
+        <form th:action="@{/admin/produtos/adicionar}" method="post" class="admin-form admin-product-form">
+
+            <div class="admin-form-group">
+                <label for="produtoNome">Nome</label>
+                <input id="produtoNome"
+                       type="text"
+                       name="nome"
+                       placeholder="Ex: Bola de Futebol Oficial"
+                       required>
+            </div>
+
+            <div class="admin-form-group">
+                <label for="produtoDescricao">Descrição</label>
+                <textarea id="produtoDescricao"
+                          name="descricao"
+                          placeholder="Descrição do produto"></textarea>
+            </div>
+
+            <div class="admin-form-group">
+                <label for="produtoPreco">Preço</label>
+                <input id="produtoPreco"
+                       type="number"
+                       name="preco"
+                       min="0"
+                       step="0.01"
+                       placeholder="0.00"
+                       required>
+            </div>
+
+            <div class="admin-form-group">
+                <label for="produtoStock">Stock</label>
+                <input id="produtoStock"
+                       type="number"
+                       name="stock"
+                       min="0"
+                       step="1"
+                       placeholder="0"
+                       required>
+            </div>
+
+            <div class="admin-form-group">
+                <label for="produtoCategoria">Categoria</label>
+                <select id="produtoCategoria" name="idCategoria" required>
+                    <option value="">Seleciona uma categoria</option>
+                    <option th:each="categoria : ${categorias}"
+                            th:value="${categoria.idCategoria}"
+                            th:text="${categoria.nome}">
+                        Categoria
+                    </option>
+                </select>
+            </div>
+
+            <div class="admin-form-group admin-form-full">
+                <label for="produtoImagem">Imagem URL</label>
+                <input id="produtoImagem"
+                       type="text"
+                       name="imagemUrl"
+                       placeholder="https://... ou /img/produtos/produto.jpg">
+            </div>
+
+            <div class="admin-form-actions admin-form-full">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    Adicionar produto
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-panel reports-panel">
+        <div class="admin-panel-header">
+            <div>
+                <h2>Produtos existentes</h2>
+                <p>Consulta e remove produtos do catálogo.</p>
+            </div>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Preço</th>
+                        <th>Stock</th>
+                        <th>Imagem</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="produto : ${produtos}">
+                        <td th:text="${produto.idProduto}">1</td>
+
+                        <td>
+                            <a th:href="@{/produto/{id}(id=${produto.idProduto})}"
+                               th:text="${produto.nome}">
+                                Produto
+                            </a>
+                        </td>
+
+                        <td th:text="${produto.categoria != null ? produto.categoria.nome : '-'}">
+                            Categoria
+                        </td>
+
+                        <td th:text="${#numbers.formatDecimal(produto.preco, 1, 2)} + ' €'">
+                            0.00 €
+                        </td>
+
+                        <td>
+                            <span class="status-pill"
+                                  th:classappend="${produto.stock > 0} ? ' status-active' : ' status-blocked'"
+                                  th:text="${produto.stock}">
+                                0
+                            </span>
+                        </td>
+
+                        <td>
+                            <span th:if="${produto.imagemUrl != null && !produto.imagemUrl.isEmpty()}"
+                                  class="status-pill status-active">
+                                Sim
+                            </span>
+
+                            <span th:if="${produto.imagemUrl == null || produto.imagemUrl.isEmpty()}"
+                                  class="status-pill status-pending">
+                                Categoria
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="admin-actions">
+                                <a th:href="@{/produto/{id}(id=${produto.idProduto})}"
+                                   class="admin-btn admin-btn-primary">
+                                    Ver
+                                </a>
+
+                                <form th:action="@{/admin/produtos/{id}/remover(id=${produto.idProduto})}"
+                                      method="post">
+                                    <button type="submit" class="admin-btn admin-btn-danger">
+                                        Remover
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${produtos == null || produtos.isEmpty()}">
+                        <td colspan="7" class="empty-row">
+                            Nenhum produto encontrado.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Categoria - ' + ${categoria} + ' | BoostMode'">Categoria | BoostMode</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a class="brand" th:href="@{/}" aria-label="BoostMode página inicial">
+                <span class="brand-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a th:href="@{/}">Início</a>
+                <a th:href="@{/carrinho}">Carrinho</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="products section">
+            <div class="container">
+                <div class="section-heading">
+                    <span>Categoria</span>
+                    <h2 th:text="${#strings.capitalize(categoria)}">Categoria</h2>
+                </div>
+
+                <div th:if="${produtos.isEmpty()}" class="empty-cart">
+                    <p>Não existem produtos nesta categoria.</p>
+                    <a th:href="@{/catalogo}" class="btn btn-primary">Voltar ao catálogo</a>
+                </div>
+
+                <div th:unless="${produtos.isEmpty()}" class="product-grid">
+                    <article class="product-card" th:each="produto : ${produtos}" th:attr="data-item-id=${produto.idProduto}">
+                        <div class="product-info">
+                            <span class="product-tag" th:text="${produto.categoria.nome}">Categoria</span>
+
+                            <h3 th:text="${produto.nome}">Nome do produto</h3>
+
+                            <p th:text="${produto.descricao}">Descrição do produto</p>
+
+                            <div class="product-price">
+                                <strong th:text="${produto.preco} + ' €'">0.00 €</strong>
+                                <span th:text="${produto.stock} + ' em stock'">0 em stock</span>
+                            </div>
+
+                            <a th:href="@{/carrinho/adicionar/{id}(id=${produto.idProduto})}" class="btn btn-primary keep-scroll">
+                                Adicionar ao carrinho
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div>
+                <a class="brand footer-brand" th:href="@{/}">
+                    <span class="brand-mark">BM</span>
+                    <span class="brand-name">BoostMode</span>
+                </a>
+                <p>Equipamento desportivo com estética tech e foco em performance.</p>
+            </div>
+        </div>
+    </footer>
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const scrollPosition = sessionStorage.getItem("scrollPosition");
+	        const clickedItemId = sessionStorage.getItem("clickedItemId");
+
+	        if (scrollPosition !== null) {
+	            document.body.classList.add("page-restoring-scroll");
+
+	            setTimeout(function () {
+	                window.scrollTo({
+	                    top: parseInt(scrollPosition),
+	                    behavior: "smooth"
+	                });
+
+	                sessionStorage.removeItem("scrollPosition");
+
+	                setTimeout(function () {
+	                    document.body.classList.remove("page-restoring-scroll");
+	                }, 350);
+	            }, 120);
+	        }
+
+	        if (clickedItemId !== null) {
+	            const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+	            if (item) {
+	                setTimeout(function () {
+	                    item.classList.add("item-highlight");
+
+	                    setTimeout(function () {
+	                        item.classList.remove("item-highlight");
+	                    }, 900);
+	                }, 450);
+	            }
+
+	            sessionStorage.removeItem("clickedItemId");
+	        }
+
+	        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+	            link.addEventListener("click", function () {
+	                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+	                const item = link.closest("[data-item-id]");
+	                if (item) {
+	                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+	                }
+
+	                document.body.classList.add("page-transition");
+	            });
+	        });
+	    });
+	</script>
+</body>
+</html>

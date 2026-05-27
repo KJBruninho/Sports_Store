@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/admin-error.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="admin-page">
+
+<header class="admin-header">
+    <div class="admin-container header-content">
+        <a class="brand" th:href="@{/admin/dashboard}">
+            <span class="brand-mark brand-mark-dark">BM</span>
+            <span>BoostMode</span>
+        </a>
+
+        <nav class="admin-nav">
+            <a th:href="@{/admin/dashboard}">Painel</a>
+            <a th:href="@{/admin/utilizadores}">Gestor de Utilizadores</a>
+            <a th:href="@{/admin/relatorios}" class="active">Gestor de Relatórios</a>
+            <a th:href="@{/admin/produtos}">Gestor de Sistemas</a>
+            <a th:href="@{/logout}">Sair</a>
+        </nav>
+    </div>
+</header>
+
+<main class="admin-main">
+    <div class="admin-container">
+
+        <section class="admin-hero">
+            <span class="admin-tag">Relatórios em tempo real</span>
+            <h1>Relatórios</h1>
+            <p>Consulta vendas, faturação, produtos mais vendidos, categorias e atividade recente da loja.</p>
+        </section>
+
+        <section class="report-kpis">
+            <article class="report-kpi-card">
+                <span>Faturação total</span>
+                <strong id="kpiFaturacao"
+                        th:text="${#numbers.formatDecimal(dados.faturacaoTotal, 1, 2)} + ' €'">
+                    0.00 €
+                </strong>
+            </article>
+
+            <article class="report-kpi-card">
+                <span>Vendas</span>
+                <strong id="kpiVendas" th:text="${dados.totalVendas}">0</strong>
+            </article>
+
+            <article class="report-kpi-card">
+                <span>Produtos vendidos</span>
+                <strong id="kpiProdutos" th:text="${dados.totalProdutosVendidos}">0</strong>
+            </article>
+
+            <article class="report-kpi-card">
+                <span>Clientes ativos</span>
+                <strong id="kpiClientes" th:text="${dados.clientesAtivos}">0</strong>
+            </article>
+
+            <article class="report-kpi-card">
+                <span>Ticket médio</span>
+                <strong id="kpiTicket"
+                        th:text="${#numbers.formatDecimal(dados.ticketMedio, 1, 2)} + ' €'">
+                    0.00 €
+                </strong>
+            </article>
+        </section>
+
+        <section class="report-grid">
+            <article class="report-panel">
+                <div class="report-panel-header">
+                    <div>
+                        <span>Últimos 7 dias</span>
+                        <h2>Faturação diária</h2>
+                    </div>
+                </div>
+
+                <canvas id="graficoFaturacao"></canvas>
+            </article>
+
+            <article class="report-panel">
+                <div class="report-panel-header">
+                    <div>
+                        <span>Ranking</span>
+                        <h2>Produtos mais vendidos</h2>
+                    </div>
+                </div>
+
+                <canvas id="graficoProdutos"></canvas>
+            </article>
+        </section>
+
+        <section class="report-grid">
+            <article class="report-panel">
+                <div class="report-panel-header">
+                    <div>
+                        <span>Ranking</span>
+                        <h2>Categorias mais vendidas</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="report-table">
+                        <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Qtd.</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tabelaCategorias">
+                        <tr th:each="categoria : ${dados.categoriasMaisVendidas}">
+                            <td th:text="${categoria.nome}">Categoria</td>
+                            <td th:text="${categoria.quantidadeVendida}">0</td>
+                            <td th:text="${#numbers.formatDecimal(categoria.totalVendido, 1, 2)} + ' €'">
+                                0.00 €
+                            </td>
+                        </tr>
+
+                        <tr th:if="${dados.categoriasMaisVendidas == null || dados.categoriasMaisVendidas.isEmpty()}">
+                            <td colspan="3" class="empty-row">
+                                Ainda não existem categorias vendidas.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="report-panel">
+                <div class="report-panel-header">
+                    <div>
+                        <span>Atividade</span>
+                        <h2>Vendas recentes</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="report-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tabelaVendasRecentes">
+                        <tr th:each="venda : ${dados.vendasRecentes}">
+                            <td th:text="${venda.idVenda}">1</td>
+                            <td th:text="${venda.cliente}">Cliente</td>
+                            <td th:text="${#temporals.format(venda.data, 'dd/MM/yyyy HH:mm')}">Data</td>
+                            <td th:text="${#numbers.formatDecimal(venda.total, 1, 2)} + ' €'">
+                                0.00 €
+                            </td>
+                        </tr>
+
+                        <tr th:if="${dados.vendasRecentes == null || dados.vendasRecentes.isEmpty()}">
+                            <td colspan="4" class="empty-row">
+                                Ainda não existem vendas recentes.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <p class="report-refresh-text">
+            Atualização automática a cada 10 segundos.
+            <span id="ultimaAtualizacao"></span>
+        </p>
+
+    </div>
+</main>
+
+<script th:inline="javascript">
+    let dadosIniciais = /*[[${dados}]]*/ {};
+
+    function formatMoney(value) {
+        const number = Number(value || 0);
+        return number.toFixed(2) + " €";
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return "-";
+        }
+
+        const date = new Date(value);
+
+        return date.toLocaleString("pt-PT", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    const faturacaoCtx = document.getElementById("graficoFaturacao");
+    const produtosCtx = document.getElementById("graficoProdutos");
+
+    const graficoFaturacao = new Chart(faturacaoCtx, {
+        type: "line",
+        data: {
+            labels: dadosIniciais.vendasPorDia.map(item => item.dia),
+            datasets: [{
+                label: "Faturação",
+                data: dadosIniciais.vendasPorDia.map(item => item.faturacao),
+                tension: 0.35
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#e5e7eb"
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#cbd5e1" },
+                    grid: { color: "rgba(148, 163, 184, 0.12)" }
+                },
+                y: {
+                    ticks: { color: "#cbd5e1" },
+                    grid: { color: "rgba(148, 163, 184, 0.12)" }
+                }
+            }
+        }
+    });
+
+    const graficoProdutos = new Chart(produtosCtx, {
+        type: "bar",
+        data: {
+            labels: dadosIniciais.produtosMaisVendidos.map(item => item.nome),
+            datasets: [{
+                label: "Quantidade vendida",
+                data: dadosIniciais.produtosMaisVendidos.map(item => item.quantidadeVendida)
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#e5e7eb"
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#cbd5e1",
+                        maxRotation: 45,
+                        minRotation: 30
+                    },
+                    grid: { color: "rgba(148, 163, 184, 0.12)" }
+                },
+                y: {
+                    ticks: { color: "#cbd5e1" },
+                    grid: { color: "rgba(148, 163, 184, 0.12)" }
+                }
+            }
+        }
+    });
+
+    function atualizarTabelas(dados) {
+        const tabelaCategorias = document.getElementById("tabelaCategorias");
+        const tabelaVendasRecentes = document.getElementById("tabelaVendasRecentes");
+
+        tabelaCategorias.innerHTML = "";
+
+        if (!dados.categoriasMaisVendidas || dados.categoriasMaisVendidas.length === 0) {
+            tabelaCategorias.innerHTML = `
+                <tr>
+                    <td colspan="3" class="empty-row">Ainda não existem categorias vendidas.</td>
+                </tr>
+            `;
+        } else {
+            dados.categoriasMaisVendidas.forEach(categoria => {
+                tabelaCategorias.innerHTML += `
+                    <tr>
+                        <td>${categoria.nome}</td>
+                        <td>${categoria.quantidadeVendida}</td>
+                        <td>${formatMoney(categoria.totalVendido)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        tabelaVendasRecentes.innerHTML = "";
+
+        if (!dados.vendasRecentes || dados.vendasRecentes.length === 0) {
+            tabelaVendasRecentes.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-row">Ainda não existem vendas recentes.</td>
+                </tr>
+            `;
+        } else {
+            dados.vendasRecentes.forEach(venda => {
+                tabelaVendasRecentes.innerHTML += `
+                    <tr>
+                        <td>${venda.idVenda}</td>
+                        <td>${venda.cliente}</td>
+                        <td>${formatDate(venda.data)}</td>
+                        <td>${formatMoney(venda.total)}</td>
+                    </tr>
+                `;
+            });
+        }
+    }
+
+    function atualizarGraficos(dados) {
+        graficoFaturacao.data.labels = dados.vendasPorDia.map(item => item.dia);
+        graficoFaturacao.data.datasets[0].data = dados.vendasPorDia.map(item => item.faturacao);
+        graficoFaturacao.update();
+
+        graficoProdutos.data.labels = dados.produtosMaisVendidos.map(item => item.nome);
+        graficoProdutos.data.datasets[0].data = dados.produtosMaisVendidos.map(item => item.quantidadeVendida);
+        graficoProdutos.update();
+    }
+
+    function atualizarKPIs(dados) {
+        document.getElementById("kpiFaturacao").textContent = formatMoney(dados.faturacaoTotal);
+        document.getElementById("kpiVendas").textContent = dados.totalVendas;
+        document.getElementById("kpiProdutos").textContent = dados.totalProdutosVendidos;
+        document.getElementById("kpiClientes").textContent = dados.clientesAtivos;
+        document.getElementById("kpiTicket").textContent = formatMoney(dados.ticketMedio);
+
+        document.getElementById("ultimaAtualizacao").textContent =
+            "Última atualização: " + new Date().toLocaleTimeString("pt-PT");
+    }
+
+    async function atualizarRelatorios() {
+        try {
+            const response = await fetch("/admin/relatorios/dados");
+
+            if (!response.ok) {
+                return;
+            }
+
+            const dados = await response.json();
+
+            atualizarKPIs(dados);
+            atualizarGraficos(dados);
+            atualizarTabelas(dados);
+        } catch (error) {
+            console.error("Erro ao atualizar relatórios:", error);
+        }
+    }
+
+    atualizarKPIs(dadosIniciais);
+    setInterval(atualizarRelatorios, 10000);
+</script>
+
+</body>
+</html>

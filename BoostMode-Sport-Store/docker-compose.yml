@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: boostmode_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sports_store
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: boostmode
+      MYSQL_PASSWORD: boostmode
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - boostmode_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boostmode_app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sports_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Lisbon
+      SPRING_DATASOURCE_USERNAME: boostmode
+      SPRING_DATASOURCE_PASSWORD: boostmode
+    networks:
+      - boostmode_network
+
+volumes:
+  mysql_data:
+
+networks:
+  boostmode_network:
+    driver: bridge

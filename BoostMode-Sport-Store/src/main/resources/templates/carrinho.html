@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho - BoostMode</title>
+    <link rel="stylesheet" href="/css/boostmode-pages.css" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <a class="brand-logo" th:href="@{/}">
+                    <span class="logo-mark">BM</span>
+                    <span class="brand-name">BoostMode</span>
+                </a>
+
+                <nav class="nav-links">
+					<a th:href="@{/}"> Inicio</a>
+                    <a th:href="@{/catalogo}">Catálogo</a>
+                    <a th:href="@{/carrinho/limpar}" class="cart-pill">Limpar carrinho</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="cart-hero">
+                <div class="hero-content">
+                    <span class="tech-tag">Carrinho</span>
+                    <h1>Confirma o teu equipamento.</h1>
+                    <p>Revê os artigos selecionados antes de avançares para a compra.</p>
+                </div>
+            </section>
+			
+			<div th:if="${erro != null}" class="alert-error">
+			    <span th:text="${erro}">Erro</span>
+			</div>
+
+			<div th:if="${aviso != null}" class="alert-warning">
+			    <span th:text="${aviso}">Aviso</span>
+			</div>
+
+			<div th:if="${sucesso != null}" class="alert-success">
+			    <span th:text="${sucesso}">Sucesso</span>
+			</div>
+
+            <section class="cart-section">
+                <h2 class="section-title">Itens no carrinho</h2>
+
+                <div th:if="${itens.isEmpty()}" class="empty-cart">
+                    <img
+                        class="empty-cart-img"
+                        src="https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=300&q=80"
+                        alt="Carrinho vazio"
+                    >
+                    <p>O carrinho está vazio.</p>
+                    <a th:href="@{/}" class="btn btn-primary" style="margin-top: 18px;">Continuar a comprar</a>
+                </div>
+
+				<article th:each="item : ${itens}" class="cart-item" th:attr="data-item-id=${item.produto.idProduto}">
+				    <div class="item-info">
+				        <div class="item-name" th:text="${item.produto.nome}">Nome do Produto</div>
+
+				        <div class="item-details">
+				            <span class="item-price" th:text="${item.produto.preco} + ' €'">Preço</span>
+				            <span class="item-stock" th:text="${item.produto.stock} + ' unidades disponíveis'">Stock</span>
+				            <span class="item-quantity" th:text="'Quantidade: ' + ${item.quantidade}">Quantidade</span>
+				        </div>
+				    </div>
+
+				    <a th:href="@{/carrinho/remover/{id}(id=${item.produto.idProduto})}" class="btn btn-danger keep-scroll">
+				        Remover
+				    </a>
+				</article>
+            </section>
+
+            <section th:unless="${itens.isEmpty()}" class="total-section">
+                <h3>Total do carrinho</h3>
+                <div class="total-amount" th:text="${total} + ' €'">0.00 €</div>
+                <a th:href="@{/checkout}" class="btn btn-primary">Finalizar compra</a>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© 2026 BoostMode — Equipamento desportivo com energia e tecnologia.</p>
+        </div>
+    </footer>
+	<script>
+	    if ("scrollRestoration" in history) {
+	        history.scrollRestoration = "manual";
+	    }
+
+	    document.documentElement.classList.add("no-smooth-scroll");
+
+	    function animateScrollTo(targetY, duration) {
+	        return new Promise(function (resolve) {
+	            const startY = window.scrollY;
+	            const distance = targetY - startY;
+	            const startTime = performance.now();
+
+	            function easeOutCubic(t) {
+	                return 1 - Math.pow(1 - t, 3);
+	            }
+
+	            function step(currentTime) {
+	                const elapsed = currentTime - startTime;
+	                const progress = Math.min(elapsed / duration, 1);
+	                const easedProgress = easeOutCubic(progress);
+
+	                window.scrollTo(0, startY + distance * easedProgress);
+
+	                if (progress < 1) {
+	                    requestAnimationFrame(step);
+	                } else {
+	                    window.scrollTo(0, targetY);
+	                    resolve();
+	                }
+	            }
+
+	            requestAnimationFrame(step);
+	        });
+	    }
+
+	    window.addEventListener("load", async function () {
+	        const scrollPosition = sessionStorage.getItem("scrollPosition");
+	        const clickedItemId = sessionStorage.getItem("clickedItemId");
+	        const loader = document.getElementById("scrollLoader");
+
+	        if (scrollPosition !== null) {
+	            if (loader) {
+	                loader.classList.add("is-active");
+	            }
+
+	            const targetY = parseInt(scrollPosition, 10);
+
+	            sessionStorage.removeItem("scrollPosition");
+
+	            /*
+	                Velocidade do scroll:
+	                120 = muito rápido
+	                180 = rápido mas visível
+	                250 = mais suave
+	            */
+	            await animateScrollTo(targetY, 100);
+
+	            if (clickedItemId !== null) {
+	                const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+	                if (item) {
+	                    item.classList.add("item-highlight");
+
+	                    setTimeout(function () {
+	                        item.classList.remove("item-highlight");
+	                    }, 700);
+	                }
+
+	                sessionStorage.removeItem("clickedItemId");
+	            }
+
+	            /*
+	                Tempo extra do loader depois do scroll:
+	                aumenta se quiseres que o loading fique mais tempo.
+	            */
+	            setTimeout(function () {
+	                if (loader) {
+	                    loader.classList.remove("is-active");
+	                }
+
+	                document.documentElement.classList.remove("no-smooth-scroll");
+	            }, 300);
+
+	        } else {
+	            document.documentElement.classList.remove("no-smooth-scroll");
+	        }
+	    });
+
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const loader = document.getElementById("scrollLoader");
+
+	        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+	            link.addEventListener("click", function () {
+	                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+	                const item = link.closest("[data-item-id]");
+	                if (item) {
+	                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+	                }
+
+	                if (loader) {
+	                    loader.classList.add("is-active");
+	                }
+	            });
+	        });
+	    });
+	</script>
+	<div id="scrollLoader" class="scroll-loader">
+	    <div class="scroll-loader-box">A atualizar...</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Favoritos - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <a class="brand-logo" th:href="@{/}">
+                <span class="logo-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/}">Início</a>
+                <a th:href="@{/catalogo}">Catálogo</a>
+
+                <a th:href="@{/carrinho}" title="Ver carrinho" class="cart-pill">
+                    Carrinho · <span th:text="${carrinhoQuantidade}">0</span>
+                    itens · <span th:text="${#numbers.formatDecimal(carrinhoTotal, 1, 2)}">0.00</span> €
+                </a>
+
+                <a th:href="@{/cliente/perfil}" class="user-pill">
+                    <span th:text="${clienteLogado != null ? clienteLogado.nome : 'Cliente'}">Cliente</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <section class="cart-hero">
+            <div class="hero-content">
+                <span class="tech-tag">Favoritos</span>
+                <h1>Produtos guardados.</h1>
+                <p>Consulta rapidamente os produtos que marcaste como favoritos.</p>
+            </div>
+        </section>
+
+        <section class="products-section">
+            <h2 class="section-title">Os meus favoritos</h2>
+            <p class="section-subtitle">Produtos guardados para veres ou comprares mais tarde.</p>
+
+            <div th:if="${favoritos == null || favoritos.isEmpty()}" class="no-products">
+                <img
+                    class="no-products-img"
+                    th:src="@{/img/default-product.png}"
+                    alt="Sem favoritos"
+                >
+                <p>Ainda não tens produtos favoritos.</p>
+
+                <br>
+
+                <a th:href="@{/catalogo}" class="btn btn-primary">
+                    Explorar catálogo
+                </a>
+            </div>
+
+            <div class="product-grid" th:unless="${favoritos == null || favoritos.isEmpty()}">
+                <article th:each="favorito : ${favoritos}"
+                         class="product-card clickable-card"
+                         th:attr="data-item-id=${favorito.produto.idProduto}">
+
+                    <a class="product-card-main-link"
+                       th:href="@{/produto/{id}(id=${favorito.produto.idProduto})}">
+
+                        <img
+                            class="product-card-image"
+                            th:src="${favorito.produto.imagemUrl != null && !favorito.produto.imagemUrl.isEmpty()
+                                ? favorito.produto.imagemUrl
+                                : (favorito.produto.categoria != null
+                                    ? '/img/categorias/' + #strings.toLowerCase(favorito.produto.categoria.nome) + '.png'
+                                    : '/img/default-product.png')}"
+                            onerror="this.onerror=null; this.src='/img/default-product.png';"
+                            th:alt="${favorito.produto.nome}"
+                        >
+
+                        <div class="product-card-body">
+                            <h3 class="product-name" th:text="${favorito.produto.nome}">
+                                Produto
+                            </h3>
+
+                            <p class="product-description" th:text="${favorito.produto.descricao}">
+                                Descrição
+                            </p>
+
+                            <div class="product-details">
+                                <span class="product-price">
+                                    <span th:text="${#numbers.formatDecimal(favorito.produto.preco, 1, 2)}">0.00</span> €
+                                </span>
+
+                                <span class="product-stock">
+                                    Stock: <span th:text="${favorito.produto.stock}">0</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="product-card-actions">
+                        <a th:href="@{/carrinho/adicionar/{id}(id=${favorito.produto.idProduto})}"
+                           class="btn btn-primary keep-scroll"
+                           style="width: 100%;">
+                            Adicionar ao carrinho
+                        </a>
+
+                        <a th:href="@{/favoritos/remover/{id}(id=${favorito.produto.idProduto})}"
+                           class="btn btn-danger keep-scroll"
+                           style="width: 100%;">
+                            Remover dos favoritos
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 BoostMode — Favoritos do cliente.</p>
+    </div>
+</footer>
+
+<script>
+    if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+    }
+
+    document.documentElement.classList.add("no-smooth-scroll");
+
+    const savedScrollPosition = sessionStorage.getItem("scrollPosition");
+
+    if (savedScrollPosition !== null) {
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("restore-hidden");
+        });
+    }
+
+    window.addEventListener("load", function () {
+        const scrollPosition = sessionStorage.getItem("scrollPosition");
+        const clickedItemId = sessionStorage.getItem("clickedItemId");
+
+        if (scrollPosition !== null) {
+            window.scrollTo({
+                top: parseInt(scrollPosition, 10),
+                left: 0,
+                behavior: "instant"
+            });
+
+            sessionStorage.removeItem("scrollPosition");
+
+            requestAnimationFrame(function () {
+                document.body.classList.remove("restore-hidden");
+
+                if (clickedItemId !== null) {
+                    const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+                    if (item) {
+                        item.classList.add("item-highlight");
+
+                        setTimeout(function () {
+                            item.classList.remove("item-highlight");
+                        }, 700);
+                    }
+
+                    sessionStorage.removeItem("clickedItemId");
+                }
+            });
+        } else {
+            document.body.classList.remove("restore-hidden");
+        }
+
+        setTimeout(function () {
+            document.documentElement.classList.remove("no-smooth-scroll");
+        }, 100);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+            link.addEventListener("click", function () {
+                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+                const item = link.closest("[data-item-id]");
+                if (item) {
+                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

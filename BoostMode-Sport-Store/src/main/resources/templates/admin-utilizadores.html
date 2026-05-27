@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Utilizadores - BoostMode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/admin-error.css" th:href="@{/css/admin-error.css}">
+</head>
+
+<body class="admin-page">
+	
+<header class="admin-header">
+    <div class="admin-container header-content">
+		<a href="/" class="brand" th:href="@{/}">
+		    <span class="brand-mark brand-mark-dark">BM</span>
+		    <span>BoostMode</span>
+		</a>
+
+		<nav class="admin-nav">
+		    <a th:href="@{/admin/dashboard}">Painel</a>
+		    <a th:href="@{/admin/utilizadores}" class="active">Gestor de Utilizadores</a>
+		    <a th:href="@{/admin/relatorios}" >Gestor de Relatórios</a>
+		    <a th:href="@{/admin/produtos}">Gestor de Sistemas</a>
+		    <a th:href="@{/logout}">Sair</a>
+		</nav>
+    </div>
+</header>
+
+<main class="admin-main">
+    <div class="admin-container">
+
+        <section class="admin-hero">
+            <span class="admin-tag">Painel interno</span>
+            <h1>Gestão de Utilizadores</h1>
+            <p>Consulta clientes, administradores, estados das contas e controla acessos à plataforma.</p>
+        </section>
+
+        <section class="admin-stats-grid">
+            <article class="admin-stat-card">
+                <span>Total</span>
+                <strong th:text="${totalUsers}">0</strong>
+                <p>utilizadores registados</p>
+            </article>
+
+            <article class="admin-stat-card">
+                <span>Clientes</span>
+                <strong th:text="${totalClientes}">0</strong>
+                <p>contas de cliente</p>
+            </article>
+
+            <article class="admin-stat-card">
+                <span>Admins</span>
+                <strong th:text="${totalAdmins}">0</strong>
+                <p>contas administrativas</p>
+            </article>
+
+            <article class="admin-stat-card">
+                <span>Bloqueados</span>
+                <strong th:text="${totalBloqueados}">0</strong>
+                <p>contas sem acesso</p>
+            </article>
+        </section>
+
+        <div th:if="${sucesso}" class="admin-alert admin-alert-success" th:text="${sucesso}">
+            Operação concluída.
+        </div>
+
+        <div th:if="${erro}" class="admin-alert admin-alert-error" th:text="${erro}">
+            Ocorreu um erro.
+        </div>
+
+        <section class="admin-panel">
+            <div class="admin-panel-header">
+                <div>
+                    <h2>Utilizadores registados</h2>
+                    <p>Lista de contas existentes no sistema.</p>
+                </div>
+
+                <a th:href="@{/signup}" class="admin-btn admin-btn-primary">
+                    Criar cliente
+                </a>
+            </div>
+
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Estado</th>
+                            <th>Morada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.idUser}">1</td>
+
+                            <td>
+                                <span th:if="${clientesPorUser[user.idUser] != null}"
+                                      th:text="${clientesPorUser[user.idUser].nome}">
+                                    Nome Cliente
+                                </span>
+
+                                <span th:if="${clientesPorUser[user.idUser] == null}" class="muted">
+                                    —
+                                </span>
+                            </td>
+
+                            <td th:text="${user.email}">email@example.com</td>
+
+                            <td>
+                                <span class="role-pill"
+                                      th:classappend="${user.role == 'ADMIN'} ? ' role-admin' : ' role-client'"
+                                      th:text="${user.role}">
+                                    CLIENTE
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-pill"
+                                      th:classappend="${user.estado.nome == 'ATIVO'} ? ' status-active' :
+                                                      (${user.estado.nome == 'BLOQUEADO'} ? ' status-blocked' : ' status-pending')"
+                                      th:text="${user.estado.nome}">
+                                    ATIVO
+                                </span>
+                            </td>
+
+                            <td>
+                                <span th:if="${clientesPorUser[user.idUser] != null}"
+                                      th:text="${clientesPorUser[user.idUser].morada != null && !clientesPorUser[user.idUser].morada.isEmpty()
+                                        ? clientesPorUser[user.idUser].morada
+                                        : 'Sem morada'}">
+                                    Morada
+                                </span>
+
+                                <span th:if="${clientesPorUser[user.idUser] == null}" class="muted">
+                                    —
+                                </span>
+                            </td>
+
+							<td>
+							    <div class="admin-actions">
+
+							        <form th:if="${user.role != 'ADMIN'}"
+							              th:action="@{/admin/utilizadores/{id}/promover(id=${user.idUser})}"
+							              method="post">
+							            <button type="submit" class="admin-btn admin-btn-primary">
+							                Promover
+							            </button>
+							        </form>
+
+							        <form th:if="${user.role == 'ADMIN'}"
+							              th:action="@{/admin/utilizadores/{id}/despromover(id=${user.idUser})}"
+							              method="post">
+							            <button type="submit" class="admin-btn admin-btn-warning">
+							                Despromover
+							            </button>
+							        </form>
+
+							        <form th:if="${user.estado.nome != 'BLOQUEADO' && user.role != 'ADMIN'}"
+							              th:action="@{/admin/utilizadores/{id}/bloquear(id=${user.idUser})}"
+							              method="post">
+							            <button type="submit" class="admin-btn admin-btn-danger">
+							                Bloquear
+							            </button>
+							        </form>
+
+							        <form th:if="${user.estado.nome == 'BLOQUEADO'}"
+							              th:action="@{/admin/utilizadores/{id}/ativar(id=${user.idUser})}"
+							              method="post">
+							            <button type="submit" class="admin-btn admin-btn-success">
+							                Ativar
+							            </button>
+							        </form>
+
+							    </div>
+							</td>
+                        </tr>
+
+                        <tr th:if="${users == null || users.isEmpty()}">
+                            <td colspan="7" class="empty-row">
+                                Nenhum utilizador encontrado.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

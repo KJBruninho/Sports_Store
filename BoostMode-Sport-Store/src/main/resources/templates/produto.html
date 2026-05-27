@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${produto.nome} + ' - BoostMode'">Detalhes do Produto - BoostMode</title>
+    <link rel="stylesheet" href="/css/boostmode-pages.css" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <a class="brand-logo" th:href="@{/}">
+                    <span class="logo-mark">BM</span>
+                    <span class="brand-name">BoostMode</span>
+                </a>
+
+                <nav class="nav-links">
+                    <a th:href="@{/}">Início</a>
+                    <a th:href="@{/catalogo}">Catálogo</a>
+					<a th:href="@{/carrinho}" title="Ver carrinho" class="cart-pill">
+					    Carrinho · <span th:text="${carrinhoQuantidade}">0</span>
+					    itens · <span th:text="${#numbers.formatDecimal(carrinhoTotal, 1, 2)}">0.00</span> €
+					</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="product-hero">
+                <div class="hero-content">
+                    <span class="tech-tag">Detalhe do produto</span>
+                    <h1 th:text="${produto.nome}">Nome do Produto</h1>
+                    <p>Consulta os detalhes antes de adicionares este artigo ao carrinho.</p>
+                </div>
+            </section>
+
+            <div class="breadcrumb">
+                <a th:href="@{/catalogo}">Catálogo</a>
+                <span> / </span>
+                <span th:text="${produto.nome}">Produto</span>
+            </div>
+
+            <section class="product-container">
+                <div class="product-image">
+
+					<img
+					    class="product-card-image"
+					    th:src="${produto.imagemUrl != null && !produto.imagemUrl.isEmpty()
+					        ? produto.imagemUrl
+					        : (produto.categoria != null && produto.categoria.imagemUrl != null && !produto.categoria.imagemUrl.isEmpty()
+					            ? produto.categoria.imagemUrl
+					            : (produto.categoria != null
+					                ? '/img/categorias/' + #strings.toLowerCase(#strings.replace(produto.categoria.nome, ' ', '-')) + '.png'
+					                : '/img/default-product.png'))}"
+					    onerror="this.onerror=null; this.src='/img/default-product.png';"
+					    th:alt="${produto.nome}"
+					>
+					
+                </div>
+
+                <div class="product-info">
+                    <h2 th:text="${produto.nome}">Nome do Produto</h2>
+
+                    <div class="product-details-panel">
+                        <div class="detail-row">
+                            <span class="detail-label">Descrição</span>
+                        </div>
+
+                        <div class="description-value" th:text="${produto.descricao}">
+                            Descrição do produto.
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">Preço</span>
+                            <span class="detail-value price-value" th:text="${produto.preco} + ' €'">0.00 €</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">Stock</span>
+                            <span
+                                class="detail-value"
+                                th:classappend="${produto.stock > 10} ? ' stock-value' : (${produto.stock > 0} ? ' stock-low' : ' stock-out')"
+                                th:text="${produto.stock}">
+                                0
+                            </span>
+
+                            <span
+                                class="status-indicator"
+                                th:classappend="${produto.stock > 10} ? ' status-available' : (${produto.stock > 0} ? ' status-low' : ' status-out')"
+                                th:text="${produto.stock > 10} ? 'Disponível' : (${produto.stock > 0} ? 'Stock baixo' : 'Esgotado')">
+                                Status
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+						<form th:action="@{/carrinho/adicionar/{id}(id=${produto.idProduto})}"
+						      method="post"
+						      class="add-cart-form keep-scroll-form">
+
+						    <div class="quantity-control">
+						        <label th:for="'quantidade-' + ${produto.idProduto}">Qtd.</label>
+
+						        <input
+						            th:id="'quantidade-' + ${produto.idProduto}"
+						            type="number"
+						            name="quantidade"
+						            min="1"
+						            th:max="${produto.stock}"
+						            value="1"
+						            required
+						        >
+						    </div>
+
+						    <button type="submit"
+						            class="btn btn-primary keep-scroll"
+						            style="width: 100%;"
+						            th:disabled="${produto.stock <= 0}">
+						        Adicionar ao carrinho
+						    </button>
+						</form>
+                    </div>
+                </div>
+            </section>
+
+            <section class="related-section">
+                <h3 class="section-title" style="font-size: 2rem;">Mais artigos para performance</h3>
+                <p class="section-subtitle">Continua a explorar o catálogo BoostMode.</p>
+                <a th:href="@{/catalogo}" class="btn btn-primary">Ver catálogo</a>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© 2026 BoostMode — Equipamento desportivo com energia e tecnologia.</p>
+        </div>
+    </footer>
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const scrollPosition = sessionStorage.getItem("scrollPosition");
+	        const clickedItemId = sessionStorage.getItem("clickedItemId");
+
+	        if (scrollPosition !== null) {
+	            document.body.classList.add("page-restoring-scroll");
+
+	            setTimeout(function () {
+	                window.scrollTo({
+	                    top: parseInt(scrollPosition),
+	                    behavior: "smooth"
+	                });
+
+	                sessionStorage.removeItem("scrollPosition");
+
+	                setTimeout(function () {
+	                    document.body.classList.remove("page-restoring-scroll");
+	                }, 350);
+	            }, 120);
+	        }
+
+	        if (clickedItemId !== null) {
+	            const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+	            if (item) {
+	                setTimeout(function () {
+	                    item.classList.add("item-highlight");
+
+	                    setTimeout(function () {
+	                        item.classList.remove("item-highlight");
+	                    }, 900);
+	                }, 450);
+	            }
+
+	            sessionStorage.removeItem("clickedItemId");
+	        }
+
+	        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+	            link.addEventListener("click", function () {
+	                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+	                const item = link.closest("[data-item-id]");
+	                if (item) {
+	                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+	                }
+
+	                document.body.classList.add("page-transition");
+	            });
+	        });
+	    });
+	</script>
+</body>
+</html>

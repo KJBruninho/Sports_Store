@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoostMode - Equipamento Desportivo</title>
+	<style>
+	    html {
+	        visibility: hidden;
+	        opacity: 0;
+	    }
+
+	    html.page-ready {
+	        visibility: visible;
+	        opacity: 1;
+	        transition: opacity 0.12s ease;
+	    }
+	</style>
+
+    <link rel="stylesheet" href="/css/home.css" th:href="@{/css/home.css}">
+
+	<script>
+	    window.addEventListener("load", function () {
+	        document.documentElement.classList.add("page-ready");
+	    });
+	</script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a class="brand" href="#home" aria-label="BoostMode página inicial">
+                <span class="brand-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a href="#home">Início</a>
+                <a href="#categories">Categorias</a>
+                <a href="#products">Produtos</a>
+                <a href="#stats">Performance</a>
+				<a href="/catalogo">Catálogo</a>
+            </nav>
+
+            <div class="header-actions">
+				<th:block th:if="${clienteLogado == null}">
+				    <a th:href="@{/login}" class="btn btn-ghost">Entrar</a>
+				    <a th:href="@{/signup}" class="btn btn-primary">Criar conta</a>
+				</th:block>
+
+				<th:block th:if="${clienteLogado != null}">
+					
+					<a th:href="@{/cliente/perfil}" class="btn user-pill">
+					    <span th:text="${clienteLogado.nome}">Cliente</span>
+					</a>
+
+				    <a th:href="@{/logout}" class="logout-pill">
+				        Sair
+				    </a>
+				</th:block>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="home" aria-label="Destaque principal BoostMode">
+            <div class="hero-slider" aria-hidden="true">
+                <div class="hero-slide slide-one"></div>
+                <div class="hero-slide slide-two"></div>
+                <div class="hero-slide slide-three"></div>
+            </div>
+
+            <div class="hero-overlay"></div>
+
+            <div class="container hero-content">
+                <span class="eyebrow">Sport • Tech • Performance</span>
+                <h1>Entra em modo de alta performance.</h1>
+                <p>
+                    Equipamento desportivo com visual tecnológico, materiais resistentes
+                    e foco total em treino, velocidade e evolução.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#products" class="btn btn-primary btn-large">Ver produtos</a>
+                    <a href="#categories" class="btn btn-outline btn-large">Explorar categorias</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="search-section" aria-label="Pesquisa de produtos">
+            <div class="container search-panel">
+                <div>
+                    <h2>Pesquisa rápida</h2>
+                    <p>Encontra equipamento por modalidade, produto ou objetivo de treino.</p>
+                </div>
+
+                <form class="search-form" th:action="@{/catalogo}" method="get">
+                    <input type="search" name="termo" placeholder="Pesquisar produtos..." aria-label="Pesquisar produtos">
+                    <button type="submit" class="btn btn-primary">Pesquisar</button>
+                </form>
+            </div>
+        </section>
+
+		<section class="categories section" id="categories">
+		    <div class="container">
+		        <div class="section-heading">
+		            <span>Top categorias</span>
+		            <h2>Categorias mais vendidas</h2>
+		        </div>
+		
+		        <div class="category-grid"
+		             th:if="${categoriasMaisVendidas != null && !categoriasMaisVendidas.isEmpty()}">
+		
+		            <a th:each="categoria : ${categoriasMaisVendidas}"
+		               class="category-card"
+		               th:href="@{/catalogo(categoria=${categoria.idCategoria})}">
+		
+					   <img
+					       th:src="${categoria.imagemUrl != null && !categoria.imagemUrl.isEmpty()
+					           ? categoria.imagemUrl
+					           : '/img/categorias/' + #strings.toLowerCase(#strings.replace(categoria.nome, ' ', '-')) + '.png'}"
+					       onerror="this.onerror=null; this.src='/img/default-product.png';"
+					       th:alt="${categoria.nome}"
+					   >
+		
+		                <div class="category-card-content">
+		                    <h3 th:text="${categoria.nome}">Categoria</h3>
+		                    <p>Uma das categorias mais compradas pelos clientes BoostMode.</p>
+		                </div>
+		            </a>
+		        </div>
+		
+		        <div th:if="${categoriasMaisVendidas == null || categoriasMaisVendidas.isEmpty()}">
+		            <p>Ainda não existem vendas suficientes para destacar categorias.</p>
+		        </div>
+		    </div>
+		</section>
+		
+		<section class="products section" id="products">
+		    <div class="container">
+		        <div class="section-heading">
+		            <span>Boost picks</span>
+		            <h2>Produtos mais vendidos</h2>
+		        </div>
+		
+		        <div class="product-grid" th:if="${produtosDestaque != null && !produtosDestaque.isEmpty()}">
+		            <a th:each="produto : ${produtosDestaque}"
+		               class="product-card"
+		               th:href="@{/produto/{id}(id=${produto.idProduto})}">
+		
+					   <img
+					       class="product-card-image"
+					       th:src="${produto.imagemUrl != null && !produto.imagemUrl.isEmpty()
+					           ? produto.imagemUrl
+					           : (produto.categoria != null && produto.categoria.imagemUrl != null && !produto.categoria.imagemUrl.isEmpty()
+					               ? produto.categoria.imagemUrl
+					               : (produto.categoria != null
+					                   ? '/img/categorias/' + #strings.toLowerCase(#strings.replace(produto.categoria.nome, ' ', '-')) + '.png'
+					                   : '/img/default-product.png'))}"
+					       onerror="this.onerror=null; this.src='/img/default-product.png';"
+					       th:alt="${produto.nome}"
+					   >
+		
+		                <div class="product-info">
+		                    <span class="product-tag"
+		                          th:text="${produto.categoria != null ? produto.categoria.nome : 'Produto'}">
+		                        Categoria
+		                    </span>
+		
+		                    <h3 th:text="${produto.nome}">Nome do produto</h3>
+		
+		                    <p th:text="${produto.descricao}">Descrição do produto</p>
+		
+		                    <div class="product-price">
+		                        <strong th:text="${#numbers.formatDecimal(produto.preco, 1, 2)} + ' €'">0.00 €</strong>
+		                        <span th:text="${produto.stock} + ' em stock'">0 em stock</span>
+		                    </div>
+		                </div>
+		            </a>
+		        </div>
+		
+		        <div th:if="${produtosMaisVendidos == null || produtosMaisVendidos.isEmpty()}">
+		            <p>Ainda não existem produtos vendidos suficientes.</p>
+		        </div>
+		    </div>
+		</section>
+
+        <section class="stats-dashboard section" id="stats">
+            <div class="container">
+                <div class="section-heading">
+                    <span>Performance da loja</span>
+                    <h2>Indicadores principais</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <strong th:text="${totalVendidos}">0</strong>
+						
+                        <span>Produtos vendidos</span>
+                    </div>
+                    <div class="stat-card">
+						<strong>€<span th:text="${#numbers.formatDecimal(totalPrecos, 1, 2)}">0</span></strong>
+                        <span>Faturação mensal</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong th:text="${clientesAtivos}">0</strong>
+                        <span>Clientes registados</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong th:text="${totalStock}">0</strong>
+                        <span>Produtos em stock</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div>
+                <a class="brand footer-brand" href="#home">
+                    <span class="brand-mark">BM</span>
+                    <span class="brand-name">BoostMode</span>
+                </a>
+                <p>Equipamento desportivo com estética tech e foco em performance.</p>
+            </div>
+
+            <div>
+                <h3>Categorias</h3>
+                <a th:href="@{/categorias/futebol}">Futebol </a>
+                <a th:href="@{/categorias/fitness}">Fitness</a>
+                <a th:href="@{/categorias/running}">Running</a>
+                <a th:href="@{categorias/ciclismo}">Ciclismo</a>
+            </div>
+
+            <div>
+                <h3>Apoio</h3>
+                <a href="/contactos">Contactos</a>
+                <a href="/entregas">Entregas</a>
+                <a href="/devolucoes">Devoluções</a>
+                <a href="/faq">FAQ</a>
+            </div>
+        </div>
+    </footer>
+	<script>
+	    if ("scrollRestoration" in history) {
+	        history.scrollRestoration = "manual";
+	    }
+
+	    document.documentElement.classList.add("no-smooth-scroll");
+
+	    function animateScrollTo(targetY, duration) {
+	        return new Promise(function (resolve) {
+	            const startY = window.scrollY;
+	            const distance = targetY - startY;
+	            const startTime = performance.now();
+
+	            function easeOutCubic(t) {
+	                return 1 - Math.pow(1 - t, 3);
+	            }
+
+	            function step(currentTime) {
+	                const elapsed = currentTime - startTime;
+	                const progress = Math.min(elapsed / duration, 1);
+	                const easedProgress = easeOutCubic(progress);
+
+	                window.scrollTo(0, startY + distance * easedProgress);
+
+	                if (progress < 1) {
+	                    requestAnimationFrame(step);
+	                } else {
+	                    window.scrollTo(0, targetY);
+	                    resolve();
+	                }
+	            }
+
+	            requestAnimationFrame(step);
+	        });
+	    }
+
+	    window.addEventListener("load", async function () {
+	        const scrollPosition = sessionStorage.getItem("scrollPosition");
+	        const clickedItemId = sessionStorage.getItem("clickedItemId");
+	        const loader = document.getElementById("scrollLoader");
+
+	        if (scrollPosition !== null) {
+	            if (loader) {
+	                loader.classList.add("is-active");
+	            }
+
+	            const targetY = parseInt(scrollPosition, 10);
+
+	            sessionStorage.removeItem("scrollPosition");
+
+	            await animateScrollTo(targetY, 160);
+
+	            if (clickedItemId !== null) {
+	                const item = document.querySelector('[data-item-id="' + clickedItemId + '"]');
+
+	                if (item) {
+	                    item.classList.add("item-highlight");
+
+	                    setTimeout(function () {
+	                        item.classList.remove("item-highlight");
+	                    }, 700);
+	                }
+
+	                sessionStorage.removeItem("clickedItemId");
+	            }
+
+	            
+	            setTimeout(function () {
+	                if (loader) {
+	                    loader.classList.remove("is-active");
+	                }
+
+	                document.documentElement.classList.remove("no-smooth-scroll");
+	            }, 120);
+
+	        } else {
+	            document.documentElement.classList.remove("no-smooth-scroll");
+	        }
+	    });
+
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const loader = document.getElementById("scrollLoader");
+
+	        document.querySelectorAll("a.keep-scroll").forEach(function (link) {
+	            link.addEventListener("click", function () {
+	                sessionStorage.setItem("scrollPosition", window.scrollY);
+
+	                const item = link.closest("[data-item-id]");
+	                if (item) {
+	                    sessionStorage.setItem("clickedItemId", item.getAttribute("data-item-id"));
+	                }
+
+	                if (loader) {
+	                    loader.classList.add("is-active");
+	                }
+	            });
+	        });
+	    });
+	</script>
+	<div id="scrollLoader" class="scroll-loader">
+	    <div class="scroll-loader-box">A atualizar...</div>
+	</div>
+</body>
+</html>

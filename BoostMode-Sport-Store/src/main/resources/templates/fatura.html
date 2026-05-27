@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fatura - BoostMode</title>
+    <link rel="stylesheet" th:href="@{/css/boostmode-pages.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <a class="brand-logo" th:href="@{/}">
+                <span class="logo-mark">BM</span>
+                <span class="brand-name">BoostMode</span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/catalogo}">Catálogo</a>
+                <a th:href="@{/carrinho}">Carrinho</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <section class="cart-hero">
+            <div class="hero-content">
+                <span class="tech-tag">Fatura</span>
+                <h1>Compra finalizada.</h1>
+                <p>A tua fatura foi gerada com sucesso.</p>
+            </div>
+        </section>
+
+        <section class="cart-section">
+            <h2 class="section-title">Fatura nº <span th:text="${fatura.idFatura}">1</span></h2>
+
+            <p><strong>Cliente:</strong> <span th:text="${cliente.nome}">Nome Cliente</span></p>
+            <p><strong>Data:</strong> <span th:text="${fatura.dataEmissao}">Data</span></p>
+
+            <br>
+
+            <article th:each="item : ${itens}" class="cart-item">
+                <div class="item-info">
+                    <div class="item-name" th:text="${item.produto.nome}">Produto</div>
+                    <div class="item-details">
+                        <span th:text="'Quantidade: ' + ${item.quantidade}">Quantidade</span>
+                        <span th:text="'Preço unitário: ' + ${item.precoUnitario} + ' €'">Preço</span>
+                        <span th:text="'Subtotal: ' + ${item.precoUnitario * item.quantidade} + ' €'">Subtotal</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="total-section">
+            <h3>Total pago</h3>
+            <div class="total-amount" th:text="${#numbers.formatDecimal(fatura.total, 1, 2)} + ' €'">0.00 €</div>
+
+            <a th:href="@{/faturas/{id}/download(id=${fatura.idFatura})}" class="btn btn-primary">
+                Download da fatura
+            </a>
+
+            <a th:href="@{/catalogo}" class="btn btn-outline">
+                Continuar a comprar
+            </a>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>
