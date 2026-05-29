@@ -84,7 +84,7 @@ git clone https://github.com/KJBruninho/Sports_Store.git
 ### 2. Aceder à pasta do projeto
 
 ```bash
-cd Sports_Store
+cd Sports_Store/BoostMode-Sport-Store/
 ```
 
 ### 3. Executar com Docker Compose
